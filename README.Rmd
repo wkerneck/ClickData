@@ -52,7 +52,7 @@ setwd("/Users/wkerneck/desktop/ClickData/")
 
 #### Getting the Data
 
-We will create a loop to in R to pull all 31 .csv files. The files will be downlaoded to your working directory.
+We will create a loop to in R to pull all 31 .csv files. The data and variables will be stored in memory.
 
 ```{r}
 nyt <- NULL
@@ -69,13 +69,13 @@ nyt_origin <- nyt
 
 #### Analysis of the data set
 
-Rough analysis of all the datasets. There are 14905865 observations of 6 variables. Below are the details of dataset:
+Rough analysis of all the datasets. There are 14905865 observations of 7 variables. Below are the details of dataset:
 
 
 ```{r}
-dim(nyt)
-str(nyt)
-summary(nyt)
+dim(nyt_origin)
+str(nyt_origin)
+summary(nyt_origin)
 ```
 
 
@@ -83,15 +83,15 @@ Let's take a look how the data is distributed through the use of data visualizat
 
 
 ```{r}
-hist(nyt$Age, main="", xlab="Age")
+hist(nyt_origin$Age, main="", xlab="Age")
 ```
 
 ```{r}
-hist(nyt$Impressions, main="", xlab="# of Impressions")
+hist(nyt_origin$Impressions, main="", xlab="# of Impressions")
 ```
 
 ```{r}
-range(nyt$Clicks)
+range(nyt_origin$Clicks)
 ```
 
 ****************************
@@ -102,31 +102,36 @@ range(nyt$Clicks)
 Create a new variable named "Age_group", that groups users into age categories into the following: < 18, 18-24, 25-34, 35-44, 45-54, 55-64, 65+
 
 ```{r}
-nyt$Age_Group <- cut(nyt$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
+nyt_origin$Age_Group <- cut(nyt_origin$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
 
-levels(nyt$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+levels(nyt_origin$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
 ```
 
+Take a look at the changes:
+
+```{r}
+head(nyt_origin)
+```
 <br>
 
 #### Task 2
 
 For a single day, plot the distributions of ‘number of impressions’ and ‘click-through-rate’ by Age_Group. (CTR = clicks/impressions).
 
-2.1) Create a subset of data1 to exclude rows where there are no impressions (if there are no impressions, we assume there will be no clicks). Name the new object d1
+2.1) Create a subset of data1 to exclude rows where there are no impressions (if there are no impressions, we assume there will be no clicks). Name the new object CTR
 
 ```{r}
-d1 <- subset(nyt, Impressions>0)
+nytsub <- subset(nyt_origin, Impressions>0)
 ```
 
 <br>
 
-2.2) Add a column to d1 called CTR containing the click-through-rate
+2.2) Add a column called CTR containing the click-through-rate per Day
 
 ```{r}
-d1$CTR <- d1$Clicks/d1$Impressions
+nytsub$CTR <- nytsub$Clicks/nytsub$Impressions
 
-head(d1)
+head(nytsub)
 ```
 
 <br>
@@ -134,16 +139,16 @@ head(d1)
 2.3) Plot the distribution of Impressions>0, grouped by Age_Group, using the ggplot2 package
 
 ```{r}
-ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
+ggplot(subset(nytsub, Impressions>0), aes(x=Impressions, fill=Age_Group))+
     geom_histogram(binwidth=1)
 ```
 
 <br>
 
-2.4) Plot the distribution of CTR>0, grouped by Age_Group
+2.4) Plot the distribution of CTR>0, grouped by day for the month of May 2012
+
 
 ```{r}
-ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
-    labs(title="Click-through rate by age group for the month of May 2012")+
-    geom_histogram(binwidth=.025)
+ggplot(subset(nytsub, Impressions>0), aes(x=day, fill=Impressions))+
+ geom_histogram(binwidth=.5)
 ```
